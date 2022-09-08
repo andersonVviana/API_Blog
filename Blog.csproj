@@ -24,6 +24,7 @@
     <ItemGroup>
       <Compile Remove="Controllers\WeatherForecastController.cs" />
       <Compile Remove="WeatherForecast.cs" />
+      <Compile Remove="ViewsModels\EditCategoryViewModel.cs" />
     </ItemGroup>
 
 </Project>
