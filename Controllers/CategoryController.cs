@@ -13,8 +13,15 @@ public class CategoryController : ControllerBase
     public async Task<IActionResult> GetAsync(
         [FromServices]BlogDataContext context)
     {
-        var categories = await context.Categories.ToListAsync();
-        return Ok(categories);
+        try
+        {
+            var categories = await context.Categories.ToListAsync();
+            return Ok(new ResultViewModel<List<Category>>(categories));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("01AA002 - Internal Server Fail"));
+        }
     }
     
     [HttpGet("v1/categories/{id:int}")]
