@@ -1,4 +1,5 @@
 ﻿using Blog.Data;
+using Blog.Extensions;
 using Blog.Models;
 using Blog.ViewsModels;
 using Microsoft.AspNetCore.Mvc;
@@ -36,20 +37,15 @@ public class CategoryController : ControllerBase
                 .FirstOrDefaultAsync(x=>x.Id == id);
 
             if (category == null)
-                return NotFound();
+                return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));
             
-            return Ok(category);
+            return Ok(new ResultViewModel<Category>(category));
         }
-        catch (DbUpdateException dbuex)
+        catch
         {
-            return StatusCode(500, "01AA001 - It was not possible to get the category");
+            return StatusCode(500, new ResultViewModel<Category>("Falha interna no servidor"));
         }
-        
-        catch (Exception ex)
-        {
-            return StatusCode(500, "01AA002 - Internal Server Fail");
-        }
-        
+
     }
     
     [HttpPost("v1/categories")]
@@ -57,6 +53,9 @@ public class CategoryController : ControllerBase
         [FromBody] EditorCategoryViewModel model,
         [FromServices]BlogDataContext context)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState.GetErrors());
+
         try
         {
             var category = new Category
@@ -68,7 +67,7 @@ public class CategoryController : ControllerBase
             await context.Categories.AddAsync(category);
             await context.SaveChangesAsync();
 
-            return Created($"v1/categories/{category.Id}", category);
+            return Created($"v1/categories/{category.Id}", new ResultViewModel<Category>(category));
         }
         
         catch (DbUpdateException dbuex)
